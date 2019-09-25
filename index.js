@@ -1,9 +1,9 @@
 /**
-*
-* @file     pxtorem转换
-* @author   aralic(aralic@163.com)
-* @date     2015-09-14
-*/
+ *
+ * @file     pxtorem转换
+ * @author   aralic(aralic@163.com)
+ * @date     2015-09-14
+ */
 
 // 引入模块
 var fs = require('fs'),
@@ -34,40 +34,42 @@ var CONFIG = {
     "replace": true,
     "media_query": false
 }
+
 if (ARGV.length >= 3 && ARGV[2] === 'init') {
     // node index.js init
     init();
 } else if (ARGV.length >= 3 && ARGV[2] === 'build') {
-    // node index.js build
     build();
 } else {
     console.error('please command node index.js init or node index.js build');
 }
+
+
 // 初始化操作
 // 如果当前目录不存在pxtorem.json配置文件
 // 则由此CONFIG配置生成文件
 function init() {
-    var promise = new Promise(function(resolve, reject) {
+    var promise = new Promise(function (resolve, reject) {
         fs.exists(
             BASE_DIR + '/pxtorem.json',
-            function(bool) {
+            function (bool) {
                 // bool为false 文件不存在 启用resolve
                 bool ? reject() : resolve();
             }
         );
     });
-    promise.then(function() {
+    promise.then(function () {
         fs.writeFile(
             BASE_DIR + '/pxtorem.json',
             JSON.stringify(CONFIG, null, 4),
-            function(err) {
+            function (err) {
                 if (err) reject(err);
                 console.log('create pxtorem.json success')
             }
         );
-    }, function() {
+    }, function () {
         console.log('pxtorem.json file exist!!!\nplease command node index.js build');
-    }).catch(function(err) {
+    }).catch(function (err) {
         console.log(err);
     });
 }
@@ -75,12 +77,15 @@ function init() {
 function build() {
     if (isExistsFile('/pxtorem.json')) {
         var opts = require('./pxtorem.json');
+        // node index.js build
         initOpts(opts);
+
     } else {
         console.error('error,file not exist!');
     }
 
 }
+
 /**
  * 对配置的文件进行初始化操作
  * @param  {Object} opts pxtorem.json文件内容
@@ -89,16 +94,16 @@ function build() {
 function initOpts(opts) {
     var optsFiles = opts.files;
     var promisePath = [];
-    
-    if (util.isArray(optsFiles)
-        && optsFiles.length > 0) {
+
+    if (util.isArray(optsFiles) &&
+        optsFiles.length > 0) {
         // 从配置文件提取需要转换的css文件
         // push到fileArr数组中
         fileArr = optsFiles.
-        filter(function(item) {
+        filter(function (item) {
             return path.extname(item) === '.css';
         }).
-        map(function(file) {
+        map(function (file) {
             file = path.join(BASE_DIR, file);
             map[file] = true;
             return file;
@@ -109,12 +114,14 @@ function initOpts(opts) {
         // 过滤到重复的css文件
         // 返回新数组[promise, promise]
         promisePath = optsFiles.
-        filter(function(item) {
+        filter(function (item) {
             return path.extname(item) === '';
         }).
-        map(function(dir) {
+        map(function (dir) {
             return readDir(dir);
         });
+
+
         allDone(promisePath, opts);
     } else {
         console.log('please write filepathname in pxtorem.json files []');
@@ -128,24 +135,26 @@ function initOpts(opts) {
  * @return {Object}     promise对象
  */
 function readDir(dir) {
-    var promise = new Promise(function(resolve, reject) {
-        fs.readdir(dir, function(err, files) {
+
+
+    var promise = new Promise(function (resolve, reject) {
+        fs.readdir(dir, function (err, files) {
             if (err) reject(err);
             resolve(files);
         });
     });
 
-    promise = promise.then(function(files) {
+    promise = promise.then(function (files) {
         // 当文件名不含有torem-
         // 并且是CSS文件，把文件push到fileArr数组中
         files.
-        filter(function(file) {
+        filter(function (file) {
             return path.extname(file) === '.css' && file.indexOf('torem-') === -1;
         }).
-        map(function(file) {
+        map(function (file) {
             return path.join(BASE_DIR, dir, file);
         }).
-        forEach(function(file){
+        forEach(function (file) {
             if (!map[file]) {
                 fileArr.push(file);
                 map[file] = true;
@@ -159,24 +168,25 @@ function readDir(dir) {
 // 依次转换CSS文件
 // 编译输出
 function complie(filePath, opts) {
-    var promise = new Promise(function(resolve, reject) {
+
+    var promise = new Promise(function (resolve, reject) {
         fs.readFile(
             filePath,
             'utf8',
-            function(err, data) {
+            function (err, data) {
                 if (err) reject(err);
                 resolve(data);
             }
         );
     })
-    promise = promise.then(function(css) {
+    promise = promise.then(function (css) {
         // 调用postcss-pxtorem插件
         // 返回内容
         // 写入文件
-        return postcss([pxtorem(opts)]).process(css).then(function(result) {
+        return postcss([pxtorem(opts)]).process(css).then(function (result) {
             var filename = path.basename(filePath, 'css');
-            var fileDirname = path.dirname(filePath);
-            var newFile = path.join(fileDirname, 'torem-'+filename+'css');
+            var fileDirname = './css';
+            var newFile = path.join(fileDirname, filename + 'css');
             return outFile(newFile, result.css);
         });
     });
@@ -185,37 +195,48 @@ function complie(filePath, opts) {
 
 // 编译好的内容写入文件
 function outFile(filename, css) {
-    var promise = new Promise(function(resolve, reject) {
+
+    var promise = new Promise(function (resolve, reject) {
         fs.writeFile(
             filename,
             css,
             'utf8',
-            function(err) {
+            function (err) {
                 if (err) reject(err);
                 resolve();
             }
         );
     });
-    promise = promise.then(function() {
-        console.log(filename+ '  create success!');
+    promise = promise.then(function () {
+        console.log(filename + '  create success!');
     });
     return promise;
 }
 
+
 // all done 
 function allDone(promisePath, opts) {
     // 监听所有的css文件编译，当全部完成触发
-    Promise.all(promisePath).then(function() {
+    Promise.all(promisePath).then(function () {
+
         // 读取完路径并且push转换文件函数到数组arr中 
         var eventQueen = [];
-        eventQueen = fileArr.map(function(file) {
+        eventQueen = fileArr.map(function (file) {
+            fs.watch('cssbefore', function (event, filename) {
+                if (event == "change") {
+                    return complie(file, opts);
+                }
+            });
             return complie(file, opts);
         });
-        Promise.all(eventQueen).then(function() {
+        Promise.all(eventQueen).then(function () {
             console.log('all task done!')
+
         });
 
+
     });
+
 }
 // 判断配置文件是否存在
 function isExistsFile(filePath) {

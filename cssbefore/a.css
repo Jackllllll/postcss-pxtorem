@@ -1,0 +1,9 @@
+a {
+  width: 7500px;
+  height: 0.005rem;
+  background: red;
+  border: 1px solid red;
+  bottom: 150px;
+  font-size: 750px;
+  font: 400px 600 'sss';
+}

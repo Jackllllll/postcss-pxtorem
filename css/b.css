@@ -1,13 +1,6 @@
 a {
-    width: 5rem;
+    width: 20000rem;
     height: 0.005rem;
     background: red;
     border: 1px solid red;
-}
-
-@media screen and (max-width: 100px) {
-    body {
-        width: 5rem;
-        height: 5rem;        
-    }
 }
