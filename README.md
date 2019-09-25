@@ -8,7 +8,7 @@
 
 ### 安装
 
-    git clone git@github.com:Aralic/postcss-pxtorem.git
+    https://github.com/Jackllllll/postcss-pxtorem.git
 
 ### 初始化
 
@@ -43,10 +43,9 @@
 
 对css文件只匹配了小写的px，如果需要不转换pxtorem，则可以在书写css的时候，大写PX，这样浏览器是支持的。
 
-### 参考
-
-    https://github.com/stormtea123/viewtorem
-    https://github.com/cuth/postcss-pxtorem
+### cssbefore目录
+    存放未转化css文件
+    执行 node index.js build  后会将目录下文件打包输出到css目录,   并且会监视 cssbefore目录下的css文件变化,实现热编译
 
 ### 预期功能
 
